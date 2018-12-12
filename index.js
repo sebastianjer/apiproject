@@ -1,5 +1,6 @@
-var express    = require("express");
+var express = require("express");
 var login = require('./routes/loginroutes');
+var data = require('./routes/getdata');
 var bodyParser = require('body-parser');
 var app = express();
 
@@ -18,6 +19,11 @@ router.get('/', function(req, res) {
 });
 //route to handle user registration
 router.post('/register',login.register);
-router.post('/login',login.login)
+router.post('/login',login.login);
+
+//ambil data
+router.get('/data', data.data);
+router.get('/visual', data.visualize);
+
 app.use('/api', router);
 app.listen(5000);
