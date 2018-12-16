@@ -22,14 +22,11 @@ if(!err) {
 //Register client baru
 exports.register = function(req,res){
   // console.log("req",req.body);
-  var today = new Date();
+  //var today = new Date();
   var users={
-    "first_name":req.body.first_name,
-    "last_name":req.body.last_name,
+    "name":req.body.name,
     "email":req.body.email,
     "password":req.body.password,
-    "created":today,
-    "modified":today
   }
   connection.query('INSERT INTO users SET ?',users, function (error, results, fields) {
   if (error) {

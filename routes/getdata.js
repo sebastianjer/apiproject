@@ -1,23 +1,38 @@
 var http = require('http');
+var jwt = require('jsonwebtoken');
 var d3 = require('d3-node'); //data driven documents (buat visualisasi)
 var url = 'https://data.go.id/';
 
 exports.data = function(req,res){
-  http.get(url, (res) => {
-    let data = '';
-
-    res.on('data', chunk => {
-      data += chunk;
+  var token = req.headers['x-access-token'];
+  if (!token){
+    return res.status(401).send({
+      "auth": "fail",
+      "message": "No token"
     })
+  }
+  jwt.verify(token, config.secret, function(err, decoded){
+    if (err) {
+      return res.status(500). send({
+        "auth": "fail",
+        "message": "Token auth fail"
+      })
+    }else{
+      http.get(url, (res) => {
+        let data = '';
 
-    res.on('end', () => {
-      //parse ke JSON?
-      console.log(data);
+        res.on('data', chunk => {
+          data += chunk;
+        })
 
-    })
+        res.on('end', () => {
+          //parse ke JSON? atau save ke file?
+          console.log(data);
+
+        })
+      })
+    }
   })
-
-  return data;
 }
 
 exports.visualize = function (data){
