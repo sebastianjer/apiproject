@@ -45,7 +45,7 @@ exports.data = function(req,res){
         })
       })
       //transfer ke user
-      res.download('C:/Users/Windows 8/Desktop/stsdapi/data.json');
+      res.download('./data.json');
     }
   })
 }
