@@ -12,7 +12,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use(express.static(_dirname + '/routes'));
+//app.use(express.static(_dirname + '/routes'));
 
 var router = express.Router();
 // test route

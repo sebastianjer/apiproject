@@ -2,20 +2,7 @@ var config = require("./config.json");
 var jwt = require('jsonwebtoken');
 
 //Menghubungkan ke database MySQL
-var mysql      = require('mysql');
-var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : '',
-  database : 'auth'
-});
-connection.connect(function(err){
-if(!err) {
-    console.log("Database is connected");
-} else {
-    console.log("Error connecting database");
-}
-});
+var connection = require('./db');
 
 /* --------------------------------------------------------- */
 
@@ -64,11 +51,18 @@ exports.login = function(req,res){
       if(results[0].password == password){
         //buat token
         var token = jwt.sign({id: results[0].id}, config.secret,{expiresIn: 86400});
-        res.send({
-          "code":200,
-          "success":"login successful",
-          "token":token
-            });
+        var params = [token, email];
+        connection.query('UPDATE users SET token = ? WHERE email = ?', params, function (err, results, fields){
+          if (err){
+            console.log(err);
+          }else{
+            res.send({
+              "code":200,
+              "success":"login successful",
+              "token":token
+            })
+          }
+        })
       }
       else{
         res.send({

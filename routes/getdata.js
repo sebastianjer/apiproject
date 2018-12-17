@@ -1,8 +1,12 @@
-var http = require('http');
+var config = require('./config.json');
+var connection = require('./db');
+var https = require('https');
 var jwt = require('jsonwebtoken');
 var fs = require('fs');
 var d3 = require('d3-node'); //data driven documents (buat visualisasi)
-var url = 'https://data.go.id/';
+//var url = 'https://data.go.id/'; lagi maintenance sampe sekarang, ganti source
+//ambil dri NYC Open Data
+var url = 'https://data.cityofnewyork.us/resource/hvnc-iy6e.json'
 
 exports.data = function(req,res){
   var token = req.headers['x-access-token'];
@@ -12,14 +16,15 @@ exports.data = function(req,res){
       "message": "No token"
     })
   }
-  jwt.verify(token, config.secret, function(err, decoded){
+  connection.query('SELECT * FROM users WHERE token = ?',[token], function (err, results, fields){
     if (err) {
+      console.log(err);
       return res.status(500). send({
         "auth": "fail",
         "message": "Token auth fail"
       })
     }else{
-      http.get(url, (res) => {
+      https.get(url, (res) => {
         let data = '';
 
         res.on('data', chunk => {
@@ -27,10 +32,10 @@ exports.data = function(req,res){
         })
 
         res.on('end', () => {
-          //parse ke JSON? atau save ke file?
+          //datanya sekarang sudah JSON
           console.log(data);
-          //save ke file csv
-          fs.writeFile('./data.csv', data, 'utf8', function (err){
+          //save ke file JSON
+          fs.writeFile('./data.json', data, 'utf8', function (err){
             if (err){
               console.log("Error saving to file");
             }else{
@@ -40,7 +45,7 @@ exports.data = function(req,res){
         })
       })
       //transfer ke user
-      res.download('./data.csv');
+      res.download('C:/Users/Windows 8/Desktop/stsdapi/data.json');
     }
   })
 }
