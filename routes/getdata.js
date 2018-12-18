@@ -68,14 +68,14 @@ exports.visualize = function (req,res){
     a.push(element.district);
     b.push(element.ytd_attendance_avg_);
   });
-}
 
   var data1 = [{x:a, y:b, type: 'bar'}];
-  var layout = {fileopt : "overwrite", filename : "simple-node-example"};
+  var layout = {fileopt : "overwrite", filename : "visualisasi-data"};
 
-  plotly.plot(data, layout, function (err, msg) {
+  plotly.plot(data1, layout, function (err, msg) {
 	   if (err) return console.log(err);
-	   console.log(msg);
+	   //console.log(msg);
+     res.send(msg);
   });
 
   //var dataset2 = require('./pelajar.csv');
