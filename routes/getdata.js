@@ -6,7 +6,9 @@ var fs = require('fs');
 var d3 = require('d3-node'); //data driven documents (buat visualisasi)
 //var url = 'https://data.go.id/'; lagi maintenance sampe sekarang, ganti source
 //ambil dri NYC Open Data
-var url = 'https://data.cityofnewyork.us/resource/hvnc-iy6e.json'
+var url = 'https://data.cityofnewyork.us/resource/hvnc-iy6e.json';
+
+var plotly = require('plotly')("ixora", "8hqo4E3D8oD4fs5wn4qv");
 
 exports.data = function(req,res){
   var token = req.headers['x-access-token'];
@@ -45,40 +47,36 @@ exports.data = function(req,res){
         })
       })
       //transfer ke user
-      res.download('./data.json');
+      res.download('./data.json', function (err) {
+        if (err){
+          console.log("Gagal download");
+        }else{
+          console.log("Download berhasil");
+        }
+      });
     }
   })
 }
 
 exports.visualize = function (req,res){
-  var dataset1 = require('./guru.csv');
+  var dataset1 = require('./pelajar.json');
+  var a = [];
+  var b = [];
 
-  var svgWidth = 500;
-  var svgHeight = 300;
-  var barPadding = 5;
-  var barWidth = (svgWidth / dataset1.length);
+  dataset1.forEach(function(element){
+    //console.log(element.district)
+    a.push(element.district);
+    b.push(element.ytd_attendance_avg_);
+  });
+}
 
-  var svg = d3.select('svg')
-    .attr("width", svgWidth)
-    .attr("height", svgHeight);
+  var data1 = [{x:a, y:b, type: 'bar'}];
+  var layout = {fileopt : "overwrite", filename : "simple-node-example"};
 
-  var barChart = svg.selectAll("rect")
-    .data(dataset1)
-    .enter()
-    .append("rect")
-    .attr("y", function (d) {
-      return svgHeight - d
-    })
-    .attr("height", function (d) {
-      return d
-    })
-    .attr("width", barWidth - barPadding)
-    .attr("transform", function (d,i) {
-      var translate = [barWidth * i, 0];
-      return "translate("+ translate +")";
-    });
-
-  res.send(svg);
+  plotly.plot(data, layout, function (err, msg) {
+	   if (err) return console.log(err);
+	   console.log(msg);
+  });
 
   //var dataset2 = require('./pelajar.csv');
 }
