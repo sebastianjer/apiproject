@@ -59,6 +59,7 @@ exports.data = function(req,res){
 }
 
 exports.visualize = function (req,res){
+  //dataset masih dari data yang disimpan ke dalam file, bukan dari requests
   var dataset1 = require('./pelajar.json');
   var a = [];
   var b = [];
@@ -69,10 +70,46 @@ exports.visualize = function (req,res){
     b.push(element.ytd_attendance_avg_);
   });
 
-  var data1 = [{x:a, y:b, type: 'bar'}];
-  var layout = {fileopt : "overwrite", filename : "visualisasi-data"};
+  var dataset2 = require('./guru.json');
+  var c = [];
+  var d = [];
 
-  plotly.plot(data1, layout, function (err, msg) {
+  dataset2.forEach(function(element){
+    //console.log(element.district)
+    c.push(element.district);
+    d.push(element.ytd_attendance_avg_);
+  });
+
+  var trace1 = {
+    x: a,
+    y: b,
+    name: "data pelajar",
+    type: "bar"
+  };
+
+  var trace2 = {
+    x: c,
+    y: d,
+    name: "data guru",
+    type: "bar"
+  };
+
+  var data = [trace1, trace2];
+  var layout = {
+    title: "Data Pelajar Guru",
+    yaxis: {title: "attendance pelajar"},
+    yaxis2: {
+      title: "attendance guru",
+      titlefont: {color: "rgb(148, 103, 189)"},
+      tickfont: {color: "rgb(148, 103, 189)"},
+      overlaying: "y",
+      side: "right"
+    }
+  };
+
+  var graphOptions = {layout: layout, filename: "visualisasi-data", fileopt: "overwrite"};
+
+  plotly.plot(data, graphOptions, function (err, msg) {
 	   if (err) return console.log(err);
 	   //console.log(msg);
      res.send(msg);
@@ -80,37 +117,3 @@ exports.visualize = function (req,res){
 
   //var dataset2 = require('./pelajar.csv');
 }
-
-
-
-
-
-/*
-var width = ;
-var height = ;
-
-var svg = d3.select('svg')
-  .attr("width", width)
-  .attr("height", height)
-  .attr("class", "bar-chart");
-
-var data = ;
-
-var barPadding = 5;
-var barWidth = (width / dataset.length);
-var barChart = svg.selectAll("rect")
-  .data(dataset)
-  .enter()
-  .append("rect")
-  .attr("y", function(d) {
-      return height - d
-  })
-  .attr("height", function(d) {
-      return d;
-  })
-  .attr("width", barWidth - barPadding)
-  .attr("transform", function (d, i) {
-       var translate = [barWidth * i, 0];
-       return "translate("+ translate +")";
-  });
-*/
